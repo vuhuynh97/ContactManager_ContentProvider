@@ -1,7 +1,9 @@
 package com.vuhuynh.contactmanager_contentprovider;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -67,15 +69,31 @@ public class ReadContactActivity extends AppCompatActivity {
         String[] menuItems = getResources().getStringArray(R.array.menu);
         String menuItemName = menuItems[menuItemIndex];
 
-
         switch (menuItemName) {
             case "Edit":
-                Toast.makeText(this, menuItemName, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, menuItemName + menuItemIndex, Toast.LENGTH_SHORT).show();
                 updateContact();
                 break;
             case "Delete":
-                Toast.makeText(this, menuItemName, Toast.LENGTH_SHORT).show();
-                deleteContact();
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Confirm your action");
+                builder.setMessage("Are you sure to delete?");
+                builder.setIcon(android.R.drawable.ic_dialog_alert);
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Toast.makeText(ReadContactActivity.this, "Delete", Toast.LENGTH_SHORT).show();
+                        deleteContact();
+                        dialogInterface.dismiss();
+                    }
+                });
+                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
+                builder.create().show();
                 break;
         }
         return true;
@@ -84,6 +102,7 @@ public class ReadContactActivity extends AppCompatActivity {
     private void updateContact() {
         Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
     }
+
     public void deleteContact() {
 
     }
