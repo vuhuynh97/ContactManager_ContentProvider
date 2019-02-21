@@ -1,6 +1,7 @@
 package com.vuhuynh.contactmanager_contentprovider;
 
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -10,9 +11,15 @@ import android.os.AsyncTask;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.ContextMenu;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.PopupMenu;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.vuhuynh.model.Contact_Model;
@@ -37,6 +44,48 @@ public class ReadContactActivity extends AppCompatActivity {
         contact_listview = findViewById(R.id.contact_listview);
 
         new LoadContacts().execute();// Execute the async task
+        registerForContextMenu(contact_listview);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        if (v.getId() == R.id.contact_listview) {
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+            String[] menuItems = getResources().getStringArray(R.array.menu);
+            for (int i = 0; i < menuItems.length; i++) {
+                menu.add(Menu.NONE, i, i, menuItems[i]);
+            }
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        int menuItemIndex = item.getItemId();
+        String[] menuItems = getResources().getStringArray(R.array.menu);
+        String menuItemName = menuItems[menuItemIndex];
+
+
+        switch (menuItemName) {
+            case "Edit":
+                Toast.makeText(this, menuItemName, Toast.LENGTH_SHORT).show();
+                updateContact();
+                break;
+            case "Delete":
+                Toast.makeText(this, menuItemName, Toast.LENGTH_SHORT).show();
+                deleteContact();
+                break;
+        }
+        return true;
+    }
+
+    private void updateContact() {
+        Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+    }
+    public void deleteContact() {
+
     }
 
     // Async task to load contacts
@@ -96,16 +145,7 @@ public class ReadContactActivity extends AppCompatActivity {
         Uri uri = ContactsContract.Contacts.CONTENT_URI; // Contact URI
         Cursor contactsCursor = getContentResolver().query(uri, null, null,
                 null, ContactsContract.Contacts.DISPLAY_NAME + " ASC "); // Return
-        // all
-        // contacts
-        // name
-        // containing
-        // in
-        // URI
-        // in
-        // ascending
-        // order
-        // Move cursor at starting
+
         if (contactsCursor.moveToFirst()) {
             do {
                 long contctId = contactsCursor.getLong(contactsCursor
